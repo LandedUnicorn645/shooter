@@ -1,41 +1,71 @@
-import pygame, random
+import pygame
+from player import Player
+from enemy import Enemy
 
-def game():
+class Game:
     pygame.init()
     #make it full screen
-    win = pygame.display.set_mode((1000,1000))
-    #pygame.display.set_caption()
-    running = True
-    player = createPlayer()
-    x = player[0]
-    y = player[1]
-    height = player[2]
-    width = player[3]
-    vel = player[4]
-    color = player[5]
-    while running:
-        pygame.time.delay(100)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            x -= vel
-        if keys[pygame.K_RIGHT]:
-            x += vel
-        if keys[pygame.K_DOWN]:
-            y += vel
-        if keys[pygame.K_UP]:
-            y -= vel
+    def __init__(self):
+        self._SCREENWIDTH = 1000
+        self._SCREENHEIGHT = 1000
+        self._win = pygame.display.set_mode((self._SCREENWIDTH,self._SCREENHEIGHT))
+        self._running = True
+        #self._lastdirection = 'right'
+        #self._newdirection = 'left'
+        self._player = Player(500, 500, 20, 20, 10, (0,0,255))
+        self._enemydict = {}
+        self._enemylist = []
+        self._enemynum = 5
+        self._lvl = 1
+
+    def run(self):
+        self._enemynum += self._lvl
+        self.createEnemies()
+        while self._running:
+            x = self._player.x
+            y = self._player.y
+            vel = self._player.vel
+            pygame.time.delay(100)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self._running = False
+
+            keys = pygame.key.get_pressed()
+
+            if keys[pygame.K_LEFT]:
+
+                x -= vel
+                self._player.x = x
+            if keys[pygame.K_RIGHT]:
+
+                x += vel
+                self._player.x = x
+            if keys[pygame.K_DOWN]:
+
+                y += vel
+                self._player.y = y
+            if keys[pygame.K_UP]:
+
+                y -= vel
+                self._player.y = y
 
 
-        win.fill((0,0,0))
-        pygame.draw.rect(win, color, (x,y,width,height))
-        pygame.display.update()
-    pygame.quit()
-def createPlayer():
-    player = [500, 500, 40, 40, 10, (0,0,255)]
-    return player
+            self._win.fill((0,0,0))
+            pygame.draw.rect(self._win, self._player.color, (self._player.x, self._player.y, self._player.width, self._player.height))
+            self.drawEnemy()
+            pygame.display.update()
+        pygame.quit()
 
+    def createEnemies(self):
+        for e in range(self._enemynum):
+            enemy = Enemy(10,10,self._SCREENWIDTH,self._SCREENHEIGHT, 10)
+            self._enemylist.append(enemy)
+
+
+    def drawEnemy(self):
+        for e in self._enemylist:
+            pygame.draw.rect(self._win, e.color, (e.x, e.y, e.width, e.height))
+        #pygame.display.update()
 if __name__ == "__main__":
-    game()
+    game = Game()
+    game.run()
