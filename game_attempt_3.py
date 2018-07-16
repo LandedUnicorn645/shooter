@@ -53,6 +53,7 @@ class Game:
             self._win.fill((0,0,0))
             pygame.draw.rect(self._win, self._player.color, (self._player.x, self._player.y, self._player.width, self._player.height))
             self.drawEnemy()
+            self.moveEnemy()
             pygame.display.update()
         pygame.quit()
 
@@ -65,7 +66,30 @@ class Game:
     def drawEnemy(self):
         for e in self._enemylist:
             pygame.draw.rect(self._win, e.color, (e.x, e.y, e.width, e.height))
-        #pygame.display.update()
+
+    def moveEnemy(self):
+        x = self._player.x
+        y = self._player.y
+        for e in self._enemylist:
+            self._checkX(e, x)
+            self._checkY(e, y)
+
+    def _checkX(self, enemy, value):
+        if enemy.x > value:
+            enemy.x -= enemy.vel
+        elif enemy.x < value:
+            enemy.x += enemy.vel
+        else:
+            enemy.color = (0,0,0)
+
+    def _checkY(self, enemy, value):
+        if enemy.y > value:
+            enemy.y -= enemy.vel
+        elif enemy.y < value:
+            enemy.y += enemy.vel
+        else:
+            enemy.color = (0,0,0)
+
 if __name__ == "__main__":
     game = Game()
     game.run()
