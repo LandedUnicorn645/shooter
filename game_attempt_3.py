@@ -17,6 +17,7 @@ class Game:
         self._enemylist = []
         self._enemynum = 5
         self._lvl = 1
+        self._dead = 0
 
     def run(self):
         self._enemynum += self._lvl
@@ -32,23 +33,21 @@ class Game:
 
             keys = pygame.key.get_pressed()
 
-            if keys[pygame.K_LEFT]:
+            if keys[pygame.K_LEFT] and x > 0:
 
                 x -= vel
                 self._player.x = x
-            if keys[pygame.K_RIGHT]:
+            if keys[pygame.K_RIGHT] and x < self._SCREENWIDTH - 20:
 
                 x += vel
                 self._player.x = x
-            if keys[pygame.K_DOWN]:
+            if keys[pygame.K_DOWN] and y < self._SCREENHEIGHT - 20:
 
                 y += vel
                 self._player.y = y
-            if keys[pygame.K_UP]:
-
+            if keys[pygame.K_UP] and y > 0:
                 y -= vel
                 self._player.y = y
-
 
             self._win.fill((0,0,0))
             pygame.draw.rect(self._win, self._player.color, (self._player.x, self._player.y, self._player.width, self._player.height))
@@ -59,36 +58,47 @@ class Game:
 
     def createEnemies(self):
         for e in range(self._enemynum):
-            enemy = Enemy(10,10,self._SCREENWIDTH,self._SCREENHEIGHT, 10)
+            enemy = Enemy(10,10,self._SCREENWIDTH,self._SCREENHEIGHT, 1)
             self._enemylist.append(enemy)
 
 
     def drawEnemy(self):
         for e in self._enemylist:
-            pygame.draw.rect(self._win, e.color, (e.x, e.y, e.width, e.height))
+            if e.alive:
+                print("Enemy : ", e.x," ", e.y )
+                pygame.draw.rect(self._win, e.color, (e.x, e.y, e.width, e.height))
+            else:
+                continue
 
     def moveEnemy(self):
         x = self._player.x
         y = self._player.y
         for e in self._enemylist:
-            self._checkX(e, x)
-            self._checkY(e, y)
+            if e.alive:
+                if e.x == x  and  e.y == y:
+                    self.collision(e)
+                else:
+                    self._checkX(e, x)
+                    self._checkY(e, y)
+            else:
+                continue
+
+    def collision(self, e):
+        e.alive = False
+        print("Changing status")
+        return e
 
     def _checkX(self, enemy, value):
         if enemy.x > value:
             enemy.x -= enemy.vel
         elif enemy.x < value:
             enemy.x += enemy.vel
-        else:
-            enemy.color = (0,0,0)
 
     def _checkY(self, enemy, value):
-        if enemy.y > value:
+        if enemy.y >= value:
             enemy.y -= enemy.vel
-        elif enemy.y < value:
+        elif enemy.y <= value:
             enemy.y += enemy.vel
-        else:
-            enemy.color = (0,0,0)
 
 if __name__ == "__main__":
     game = Game()
