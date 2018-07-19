@@ -4,6 +4,10 @@ from enemy import Enemy
 from bullet import Bullet
 
 class Game:
+    '''A Game class that runs the game and monitors the state of the game from what level
+        to the number of enemies
+
+        '''
     pygame.init()
     #make it full screen
     def __init__(self):
@@ -23,7 +27,7 @@ class Game:
     def run(self):
         self._enemynum += self._lvl
         self._objectlist.append(self._player)
-        self.createEnemies()
+        self._createEnemies()
         while self._running:
             x = self._player.x
             y = self._player.y
@@ -62,38 +66,36 @@ class Game:
                     self._shootdir = 'down'
                 if keys[pygame.K_UP]:
                     self._shootdir = 'up'
-                self.shoot()
+                self._shoot()
 
             self._win.fill((0,0,0))
             self._draw()
             pygame.display.update()
-            self.moveEnemy()
-            self.moveBullet()
+            self._moveEnemy()
+            self._moveBullet()
         pygame.quit()
 
     def _draw(self):
         for object in self._objectlist:
             pygame.draw.rect(self._win, object.color, (object.x, object.y, object.width, object.height))
 
-    def createEnemies(self):
+    def _createEnemies(self):
         for e in range(self._enemynum + 1):
             enemy = Enemy(10,10,self._SCREENWIDTH,self._SCREENHEIGHT, 1)
             self._enemylist.append(enemy)
             self._objectlist.append(enemy)
 
-    def moveEnemy(self):
+    def _moveEnemy(self):
         x = self._player.x
         y = self._player.y
-        #newlist = copy.deepcopy(self._enemylist)
         for e in list(self._enemylist):
             if e.x == x  and  e.y == y:
                 self._collision(e)
             else:
                 self._checkX(e, x)
                 self._checkY(e, y)
-        #self._enemylist = newlist
 
-    def shoot(self):
+    def _shoot(self):
         x = self._player.x
         print("self._player : ", self._player)
         print("self._player.x : ", self._player.x)
@@ -123,7 +125,7 @@ class Game:
         self._objectlist.append(bullet)
 
 
-    def moveBullet(self):
+    def _moveBullet(self):
         dirkey = self._bulletdirection.keys()
         for key in dirkey:
             for bul in self._bulletdirection[key]:
@@ -141,9 +143,9 @@ class Game:
                     bul.x = bul.x - bul.vel
 
     def _collision(self, e):
-        #e.color = (0,0,0)
         self._enemylist.remove(e)
         self._objectlist.remove(e)
+
     def _checkX(self, enemy, value):
         if enemy.x > value:
             enemy.x -= enemy.vel
