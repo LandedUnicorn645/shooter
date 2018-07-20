@@ -1,4 +1,4 @@
-import pygame, copy
+import pygame, copy, time
 from player import Player
 from enemy import Enemy
 from bullet import Bullet
@@ -21,59 +21,77 @@ class Game:
         self._bulletdirection = {'up': [], 'down': [], 'left': [], 'right':[]}
         self._enemylist = []
         self._enemynum = 5
-        self._lvl = 1
+        self._lvl = 0
         self._dead = 0
 
     def run(self):
-        self._enemynum += self._lvl
-        self._objectlist.append(self._player)
-        self._createEnemies()
-        while self._running:
-            x = self._player.x
-            y = self._player.y
-            vel = self._player.vel
-            pygame.time.delay(100)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self._running = False
-
-            keys = pygame.key.get_pressed()
-
-            if keys[pygame.K_a] and x > 0:
-                self._lastdir = 'left'
-                x -= vel
-                self._player.x = x
-            if keys[pygame.K_d] and x < self._SCREENWIDTH - 20:
-                self._lastdir = 'right'
-                x += vel
-                self._player.x = x
-            if keys[pygame.K_s] and y < self._SCREENHEIGHT - 20:
-                self._lastdir = 'down'
-                y += vel
-                self._player.y = y
-
-            if keys[pygame.K_w] and y > 0:
-                self._lastdir = 'up'
-                y -= vel
-                self._player.y = y
-
-            if keys[pygame.K_SPACE]:
-                if keys[pygame.K_LEFT]:
-                    self._shootdir = 'left'
-                if keys[pygame.K_RIGHT]:
-                    self._shootdir = 'right'
-                if keys[pygame.K_DOWN]:
-                    self._shootdir = 'down'
-                if keys[pygame.K_UP]:
-                    self._shootdir = 'up'
-                self._shoot()
-
+        while True:
+            self._enemynum += self._lvl
+            self._objectlist.append(self._player)
+            self._createEnemies()
+            self._lvl += 1
+            text = "lvl " + str(self._lvl)
+            self.message_display(text)
             self._win.fill((0,0,0))
-            self._draw()
-            pygame.display.update()
-            self._moveEnemy()
-            self._moveBullet()
+            while len(self._enemylist) > 0:
+                x = self._player.x
+                y = self._player.y
+                vel = self._player.vel
+                pygame.time.delay(100)
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self._running = False
+
+                keys = pygame.key.get_pressed()
+
+                if keys[pygame.K_a] and x > 0:
+                    self._lastdir = 'left'
+                    x -= vel
+                    self._player.x = x
+                if keys[pygame.K_d] and x < self._SCREENWIDTH - 20:
+                    self._lastdir = 'right'
+                    x += vel
+                    self._player.x = x
+                if keys[pygame.K_s] and y < self._SCREENHEIGHT - 20:
+                    self._lastdir = 'down'
+                    y += vel
+                    self._player.y = y
+
+                if keys[pygame.K_w] and y > 0:
+                    self._lastdir = 'up'
+                    y -= vel
+                    self._player.y = y
+
+                if keys[pygame.K_SPACE]:
+                    if keys[pygame.K_LEFT]:
+                        self._shootdir = 'left'
+                    if keys[pygame.K_RIGHT]:
+                        self._shootdir = 'right'
+                    if keys[pygame.K_DOWN]:
+                        self._shootdir = 'down'
+                    if keys[pygame.K_UP]:
+                        self._shootdir = 'up'
+                    self._shoot()
+
+                self._win.fill((0,0,0))
+                self._draw()
+                pygame.display.update()
+                self._moveEnemy()
+                self._moveBullet()
+
         pygame.quit()
+
+    def message_display(self,text):
+        textype = pygame.font.Font('freesansbold.ttf', 115)
+        TextSurf, TextRect = self.text_objects(text, textype)
+        TextRect.center = ((self._SCREENWIDTH/2),(self._SCREENHEIGHT/2))
+        pygame.display.set_mode((self._SCREENWIDTH, self._SCREENHEIGHT)).blit(TextSurf, TextRect)
+        pygame.display.update()
+        time.sleep(2)
+
+    def text_objects(self,text, font):
+        textSurface = font.render(text,True,(255,255,255))
+        return textSurface, textSurface.get_rect()
 
     def _draw(self):
         for object in self._objectlist:
@@ -90,15 +108,13 @@ class Game:
         y = self._player.y
         for e in list(self._enemylist):
             if e.x == x  and  e.y == y:
-                self._collision(e)
+                self._collision()
             else:
                 self._checkX(e, x)
                 self._checkY(e, y)
 
     def _shoot(self):
         x = self._player.x
-        print("self._player : ", self._player)
-        print("self._player.x : ", self._player.x)
         y = self._player.y
         width = self._player.width
         height = self._player.height
@@ -129,7 +145,6 @@ class Game:
         dirkey = self._bulletdirection.keys()
         for key in dirkey:
             for bul in self._bulletdirection[key]:
-                print(key, " : ", self._bulletdirection[key])
                 if key == 'up':
                     bul.y -= bul.vel
                 elif key == 'down':
@@ -137,14 +152,40 @@ class Game:
                 elif key == 'right':
                     bul.x += bul.vel
                 elif key == 'left':
-                    print("bul : ", bul)
-                    print("x : ", bul.x)
-                    print("vel : ", bul.vel)
                     bul.x = bul.x - bul.vel
+        self._checkHit()
 
-    def _collision(self, e):
+    def _checkHit(self):
+        dirkey = self._bulletdirection.keys()
+        for key in dirkey:
+            for bul in list(self._bulletdirection[key]):
+                bulx = bul.x
+                buly = bul.y
+                bulw = bul.width
+                bulh = bul.height
+                for enemy in list(self._enemylist):
+                    ex = enemy.x
+                    ey = enemy.y
+                    ew = enemy.width
+                    eh = enemy.height
+                    if bulx + bulw >= ex and bulx + bulw <= ex + ew:
+                        if buly + bulh >= ey and buly + bulh <= ey + eh:
+                            enemy.color = (255,255,255)
+                            self._hit(enemy)
+
+
+    def _hit(self, e):
         self._enemylist.remove(e)
         self._objectlist.remove(e)
+
+    def _collision(self):
+        self._lvl = 0
+        self._enemylist = []
+        self._objectlist = []
+        keys = self._bulletdirection.keys()
+        for key in keys:
+            self._bulletdirection[key] = []
+        self.message_display("Game Over!")
 
     def _checkX(self, enemy, value):
         if enemy.x > value:
