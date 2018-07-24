@@ -19,7 +19,9 @@ class Game:
         self._player = Player(500, 500, 20, 20, 10, (0,0,255))
         self._objectlist = []
         self._bulletdirection = {'up': [], 'down': [], 'left': [], 'right':[]}
+        self._numofbullets = 0
         self._enemylist = []
+        self._score = 0
         self._enemynum = 5
         self._lvl = 0
         self._dead = 0
@@ -30,10 +32,12 @@ class Game:
             self._objectlist.append(self._player)
             self._createEnemies()
             self._lvl += 1
+            self._win.fill((0,0,0))
             text = "lvl " + str(self._lvl)
             self.message_display(text)
-            self._win.fill((0,0,0))
+
             while len(self._enemylist) > 0:
+
                 x = self._player.x
                 y = self._player.y
                 vel = self._player.vel
@@ -63,21 +67,24 @@ class Game:
                     self._player.y = y
 
                 if keys[pygame.K_SPACE]:
-                    if keys[pygame.K_LEFT]:
-                        self._shootdir = 'left'
-                    if keys[pygame.K_RIGHT]:
-                        self._shootdir = 'right'
-                    if keys[pygame.K_DOWN]:
-                        self._shootdir = 'down'
-                    if keys[pygame.K_UP]:
-                        self._shootdir = 'up'
-                    self._shoot()
+                    if self._numofbullets < 30:
+                        if keys[pygame.K_LEFT]:
+                            self._shootdir = 'left'
+                        if keys[pygame.K_RIGHT]:
+                            self._shootdir = 'right'
+                        if keys[pygame.K_DOWN]:
+                            self._shootdir = 'down'
+                        if keys[pygame.K_UP]:
+                            self._shootdir = 'up'
+                        self._shoot()
 
                 self._win.fill((0,0,0))
                 self._draw()
+                self._scoreCal()
                 pygame.display.update()
                 self._moveEnemy()
                 self._moveBullet()
+
 
         pygame.quit()
 
@@ -85,7 +92,7 @@ class Game:
         textype = pygame.font.Font('freesansbold.ttf', 115)
         TextSurf, TextRect = self.text_objects(text, textype)
         TextRect.center = ((self._SCREENWIDTH/2),(self._SCREENHEIGHT/2))
-        pygame.display.set_mode((self._SCREENWIDTH, self._SCREENHEIGHT)).blit(TextSurf, TextRect)
+        self._win.blit(TextSurf, TextRect)
         pygame.display.update()
         time.sleep(2)
 
@@ -93,22 +100,31 @@ class Game:
         textSurface = font.render(text,True,(255,255,255))
         return textSurface, textSurface.get_rect()
 
+    def _scoreCal(self):
+        font = pygame.font.SysFont(None, 25)
+        text = font.render("score: "+str(self._score), True, (255,255,255))
+        self._win.blit(text, (0,0))
+        #pygame.display.update()
+
     def _draw(self):
         for object in self._objectlist:
             pygame.draw.rect(self._win, object.color, (object.x, object.y, object.width, object.height))
 
     def _createEnemies(self):
+
         for e in range(self._enemynum + 1):
-            enemy = Enemy(10,10,self._SCREENWIDTH,self._SCREENHEIGHT, 1)
+            enemy = Enemy(10,10,self._SCREENWIDTH,self._SCREENHEIGHT, 3)
             self._enemylist.append(enemy)
             self._objectlist.append(enemy)
 
     def _moveEnemy(self):
         x = self._player.x
         y = self._player.y
+        w = self._player.width
+        h = self._player.height
         for e in list(self._enemylist):
-            if e.x == x  and  e.y == y:
-                self._collision()
+            if e.x + e.width >= x  and e.x + e.width <= x + w and e.y + e.height >= y and e.y + e.height <= y + h:
+                    self._collision()
             else:
                 self._checkX(e, x)
                 self._checkY(e, y)
@@ -139,20 +155,38 @@ class Game:
             bullet = Bullet(bulletx, bullety, 5)
         self._bulletdirection[self._shootdir].append(bullet)
         self._objectlist.append(bullet)
+        self._numofbullets += 1
 
 
     def _moveBullet(self):
         dirkey = self._bulletdirection.keys()
         for key in dirkey:
-            for bul in self._bulletdirection[key]:
+            for bul in list(self._bulletdirection[key]):
+                remove = False
                 if key == 'up':
-                    bul.y -= bul.vel
+                    if bul.y > 0:
+                        bul.y -= bul.vel
+                    else:
+                        remove = True
                 elif key == 'down':
-                    bul.y += bul.vel
+                    if bul.y > self._SCREENHEIGHT:
+                        bul.y += bul.vel
+                    else:
+                        remove = True
                 elif key == 'right':
-                    bul.x += bul.vel
+                    if bul.x < self._SCREENWIDTH:
+                        bul.x += bul.vel
+                    else:
+                        remove = True
                 elif key == 'left':
-                    bul.x = bul.x - bul.vel
+                    if bul.x > 0:
+                        bul.x = bul.x - bul.vel
+                    else:
+                        remove = True
+                if remove:
+                    self._bulletdirection[key].remove(bul)
+                    self._objectlist.remove(bul)
+                    self._numofbullets -= 1
         self._checkHit()
 
     def _checkHit(self):
@@ -170,13 +204,17 @@ class Game:
                     eh = enemy.height
                     if bulx + bulw >= ex and bulx + bulw <= ex + ew:
                         if buly + bulh >= ey and buly + bulh <= ey + eh:
-                            enemy.color = (255,255,255)
-                            self._hit(enemy)
+                            self._hit(enemy, bul, key)
 
 
-    def _hit(self, e):
+
+    def _hit(self, e, bul, key):
+        self._bulletdirection[key].remove(bul)
+        self._objectlist.remove(bul)
         self._enemylist.remove(e)
         self._objectlist.remove(e)
+        self._score += 50
+        self._numofbullets -= 1
 
     def _collision(self):
         self._lvl = 0
