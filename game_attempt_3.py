@@ -1,4 +1,4 @@
-import pygame, copy, time
+import pygame, copy, time, random
 from player import Player
 from enemy import Enemy
 from bullet import Bullet
@@ -9,7 +9,6 @@ class Game:
 
         '''
     pygame.init()
-    #make it full screen
     def __init__(self):
         self._SCREENWIDTH = 1000
         self._SCREENHEIGHT = 1000
@@ -22,12 +21,13 @@ class Game:
         self._enemylist = []
         self._score = 0
         self._enemynum = 5
-        self._lvl = 0
+        self._lvl = 10
 
     def run(self):
+        self._message_display("Start")
         while True:
             self._enemynum += self._lvl
-
+            self._player.weapon.bul = 0
             self._lvl += 1
             self._win.fill((0,0,0))
             text = "lvl " + str(self._lvl)
@@ -45,6 +45,7 @@ class Game:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
+                        quit()
 
                 keys = pygame.key.get_pressed()
 
@@ -67,7 +68,7 @@ class Game:
                     self._player.y = y
 
                 if keys[pygame.K_SPACE]:
-                    if self._player.gun.bul < self._player.gun.ammo:
+                    if self._player.weapon.bul < self._player.weapon.ammo:
                         if keys[pygame.K_LEFT]:
                             self._shootdir = 'left'
                         if keys[pygame.K_RIGHT]:
@@ -99,7 +100,8 @@ class Game:
 
     def _scoreCal(self):
         font = pygame.font.SysFont(None, 25)
-        text = font.render("score: "+str(self._score), True, (255,255,255))
+        text = font.render("score: "+str(self._score)+" "+"Bullets : "+str(self._player.weapon.bul)+"/30", True, (255,255,255))
+
         self._win.blit(text, (0,0))
 
     def _draw(self):
@@ -108,7 +110,14 @@ class Game:
 
     def _createEnemies(self):
         for e in range(self._enemynum + 1):
-            enemy = Enemy(10,10,self._SCREENWIDTH,self._SCREENHEIGHT, 3)
+            if self._lvl > 3:
+                type = random.randint(1,2)
+            elif self._lvl > 10:
+                type = randim.ranint(1,3)
+            else:
+                type = 1
+            print("type : ", type)
+            enemy = Enemy(10,10,self._SCREENWIDTH,self._SCREENHEIGHT, 3, type)
             self._enemylist.append(enemy)
             self._objectlist.append(enemy)
 
@@ -129,7 +138,7 @@ class Game:
                 self._checkY(e, y)
 
     def _shoot(self):
-        self._player.gun.bul += 1
+        self._player.weapon.bul += 1
         x = self._player.x
         y = self._player.y
         width = self._player.width
@@ -155,7 +164,7 @@ class Game:
         else:
             vel = 5
         bullet = Bullet(bulletx, bullety, vel)
-        self._player.gun.addBullet(bullet)
+        self._player.weapon.addBullet(bullet)
         self._objectlist.append(bullet)
         self._bulletlist.append((bullet,self._shootdir))
 
@@ -187,17 +196,20 @@ class Game:
             if remove:
                 self._bulletlist.remove(pair)
                 self._objectlist.remove(bul)
-                self._player.gun.bul -= 1
+                self._player.weapon.bul -= 1
+        for bul in self._bulletlist:
+            print(bul)
         self._checkHit()
 
     def _checkHit(self):
+        print()
         for pair in list(self._bulletlist):
             bul = pair[0]
             bulx = bul.x
             buly = bul.y
             bulw = bul.width
             bulh = bul.height
-            for enemy in self._enemylist:
+            for enemy in list(self._enemylist):
                 ex = enemy.x
                 ey = enemy.y
                 ew = enemy.width
@@ -205,21 +217,40 @@ class Game:
                 if bulx + bulw >= ex and bulx <= ex + ew:
                     if buly + bulh >= ey and buly  <= ey + eh:
                         self._hit(enemy, pair)
+                        break
+                        for bul in self._bulletlist:
+                            print(bul)
+                        print()
 
     def _hit(self, e, tup):
+        for bul in self._bulletlist:
+            print(bul)
+        if e.hasshields:
+            e.shields -= 25
+        else:
+            e.health -= 30
+            if e.health <= 0:
+                self._enemylist.remove(e)
+                self._objectlist.remove(e)
+                self._score += 50
+        print()
+        print(tup)
+        print()
         self._bulletlist.remove(tup)
         self._objectlist.remove(tup[0])
-        self._enemylist.remove(e)
-        self._objectlist.remove(e)
-        self._score += 50
-        self._player.gun.bul -= 1
+        self._player.weapon.bul -= 1
 
     def _collision(self):
-        self._lvl = 0
-        self._enemylist = []
-        self._objectlist = []
-        self._player.gun.ammo = 30
-        self.message_display("Game Over!")
+        if self._player.hasshields:
+            self._player.shields -= 30
+        else:
+            self._player.health -= 50
+            if self._player.health == 0:
+                self._message_display("Game Over!")
+                self._lvl = 0
+                self._enemylist = []
+                self._objectlist = []
+
 
     def _checkX(self, enemy, value):
         if enemy.x > value:

@@ -1,6 +1,6 @@
 
 class Gun:
-    def __init__(self, maxammo=30, lockon=False):
+    def __init__(self, maxammo, lockon=False):
         self._maxammo = maxammo
         self._totalbul = 0
         self._lock = lockon
@@ -35,6 +35,7 @@ class Gun:
             self._bullets.append(bullet)
         else:
             return
+
     bul = property(__getBul, __setBul)
     ammo = property( __getAmmo, __setAmmo)
     lock = property( __getLock, __setLock)
