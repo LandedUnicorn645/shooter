@@ -2,6 +2,7 @@ import pygame, copy, time, random
 from player import Player
 from enemy import Enemy
 from bullet import Bullet
+from settings import Settings
 
 class SinglePLayerGame:
     '''A Game class that runs the game and monitors the state of the game from what level
@@ -10,37 +11,21 @@ class SinglePLayerGame:
         '''
     pygame.init()
     def __init__(self):
-        self._SCREENWIDTH = 1000
-        self._SCREENHEIGHT = 1000
-        self._win = pygame.display.set_mode((self._SCREENWIDTH,self._SCREENHEIGHT))
-        self._shootdir = 'left'
-        self._lastdir = 'left'
-        self._player = Player(500, 500, 20, 20, 10, (0,0,255))
-        self._objectlist = []
-        self._bulletlist = []
-        self._enemylist = []
-        self._score = 0
-        self._enemynum = 5
-        self._lvl = 10
+        self.win = pygame.display.set_mode((1000,1000))
+        self.player = Player(500, 500, 20, 20, 10, (0,0,255))
+        self.settings = Settings((1000,1000),self.win)
 
     def run(self):
         self._message_display("Start")
         while True:
-            self._enemynum += self._lvl
-            self._player.weapon.bul = 0
-            self._lvl += 1
-            self._win.fill((0,0,0))
-            text = "lvl " + str(self._lvl)
+            self.settings.set(self.player)
+            text = "lvl " + str(self.settings.lvl)
             self._message_display(text)
-            self._bulletlist = []
-            self._objectlist = []
-            self._objectlist.append(self._player)
             self._createEnemies()
-            while len(self._enemylist) > 0:
-
-                x = self._player.x
-                y = self._player.y
-                vel = self._player.vel
+            while len(self.settings.enemylist) > 0:
+                x = self.player.x
+                y = self.player.y
+                vel = self.player.vel
                 pygame.time.delay(100)
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -50,36 +35,36 @@ class SinglePLayerGame:
                 keys = pygame.key.get_pressed()
 
                 if keys[pygame.K_a] and x > 0:
-                    self._lastdir = 'left'
+                    self.player.lastdir = 'left'
                     x -= vel
-                    self._player.x = x
-                if keys[pygame.K_d] and x < self._SCREENWIDTH - 20:
-                    self._lastdir = 'right'
+                    self.player.x = x
+                if keys[pygame.K_d] and x < self.settings.screenwidth - 20:
+                    self.player.lastdir = 'right'
                     x += vel
-                    self._player.x = x
-                if keys[pygame.K_s] and y < self._SCREENHEIGHT - 20:
-                    self._lastdir = 'down'
+                    self.player.x = x
+                if keys[pygame.K_s] and y < self.settings.screenheight - 20:
+                    self.player.lastdir = 'down'
                     y += vel
-                    self._player.y = y
+                    self.player.y = y
 
                 if keys[pygame.K_w] and y > 0:
-                    self._lastdir = 'up'
+                    self.player.lastdir = 'up'
                     y -= vel
-                    self._player.y = y
+                    self.player.y = y
 
                 if keys[pygame.K_SPACE]:
-                    if self._player.weapon.bul < self._player.weapon.ammo:
+                    if self.player.weapon.bul < self.player.weapon.ammo:
                         if keys[pygame.K_LEFT]:
-                            self._shootdir = 'left'
+                            self.player.shootdir = 'left'
                         if keys[pygame.K_RIGHT]:
-                            self._shootdir = 'right'
+                            self.player.shootdir = 'right'
                         if keys[pygame.K_DOWN]:
-                            self._shootdir = 'down'
+                            self.player.shootdir = 'down'
                         if keys[pygame.K_UP]:
-                            self._shootdir = 'up'
+                            self.player.shootdir = 'up'
                         self._shoot()
 
-                self._win.fill((0,0,0))
+                self.win.fill((0,0,0))
                 self._draw()
                 self._scoreCal()
                 pygame.display.update()
@@ -89,8 +74,8 @@ class SinglePLayerGame:
     def _message_display(self,text):
         textype = pygame.font.Font('freesansbold.ttf', 115)
         TextSurf, TextRect = self._text_objects(text, textype)
-        TextRect.center = ((self._SCREENWIDTH/2),(self._SCREENHEIGHT/2))
-        self._win.blit(TextSurf, TextRect)
+        TextRect.center = ((self.settings.screenwidth/2),(self.settings.screenheight/2))
+        self.win.blit(TextSurf, TextRect)
         pygame.display.update()
         time.sleep(2)
 
@@ -100,33 +85,40 @@ class SinglePLayerGame:
 
     def _scoreCal(self):
         font = pygame.font.SysFont(None, 25)
-        text = font.render("score: "+str(self._score)+" "+"Bullets : "+str(self._player.weapon.bul)+"/30", True, (255,255,255))
+        text = font.render("score: "+str(self.settings.score)+" "+"Bullets : "+str(self.player.weapon.bul)+"/30", True, (255,255,255))
+        self.settings.win.blit(text, (0,0))
 
-        self._win.blit(text, (0,0))
 
     def _draw(self):
-        for object in self._objectlist:
-            pygame.draw.rect(self._win, object.color, (object.x, object.y, object.width, object.height))
+        for object in self.settings.objectlist:
+            pygame.draw.rect(self.win, object.color, (object.x, object.y, object.width, object.height))
 
     def _createEnemies(self):
-        for e in range(self._enemynum + 1):
-            if self._lvl > 3:
-                type = random.randint(1,2)
-            elif self._lvl > 10:
-                type = randim.ranint(1,3)
+            if self.settings.lvl > 3 and self.settings.lvl < 10:
+                for e in range(self.settings.enemynum + 1):
+                    type = random.randint(1,2)
+                    enemy = Enemy(10,10,self.settings.screenwidth,self.settigs.screenheight, 3, type)
+                    self.settings.enemylist.append(enemy)
+                    self.settings.objectlist.append(enemy)
+            elif self.settings.lvl > 10:
+                for e in range(self.settings.enemynum//2):
+                    type = random.ranint(2,3)
+                    enemy = Enemy(10,10,self.settings.screenwidth,self.settigs.screenheight, 3, type)
+                    self.settings.enemylist.append(enemy)
+                    self.settings.objectlist.append(enemy)
             else:
-                type = 1
-            print("type : ", type)
-            enemy = Enemy(10,10,self._SCREENWIDTH,self._SCREENHEIGHT, 3, type)
-            self._enemylist.append(enemy)
-            self._objectlist.append(enemy)
+                for e in range(self.settings.enemynum+1):
+                    type = 1
+                    enemy = Enemy(10,10,self.settings.screenwidth,self.settings.screenheight, 3, type)
+                    self.settings.enemylist.append(enemy)
+                    self.settings.objectlist.append(enemy)
 
     def _moveEnemy(self):
-        x = self._player.x
-        y = self._player.y
-        w = self._player.width
-        h = self._player.height
-        for e in list(self._enemylist):
+        x = self.player.x
+        y = self.player.y
+        w = self.player.width
+        h = self.player.height
+        for e in list(self.settings.enemylist):
             if e.x + e.width >= x  and e.x  <= x + w:
                 if e.y + e.height >= y and e.y  <= y + h:
 
@@ -138,38 +130,38 @@ class SinglePLayerGame:
                 self._checkY(e, y)
 
     def _shoot(self):
-        self._player.weapon.bul += 1
-        x = self._player.x
-        y = self._player.y
-        width = self._player.width
-        height = self._player.height
-        if self._shootdir == 'right':
+        self.player.weapon.bul += 1
+        x = self.player.x
+        y = self.player.y
+        width = self.player.width
+        height = self.player.height
+        if self.player.shootdir == 'right':
             bulletx = x + width
             bullety = y + (height//4)
 
-        elif self._shootdir == 'left':
+        elif self.player.shootdir == 'left':
             bulletx = x - 5
             bullety = y + (height//2)
 
-        elif self._shootdir == "up":
+        elif self.player.shootdir == "up":
             bulletx = x + (width//2)
             bullety = y - 5
 
-        elif self._shootdir == 'down':
+        elif self.player.shootdir == 'down':
             bulletx = x + (width//2)
             bullety = y + height
 
-        if self._shootdir == self._lastdir:
-            vel = self._player.vel + 2
+        if self.player.shootdir == self.player.lastdir:
+            vel = self.player.vel + 2
         else:
             vel = 5
         bullet = Bullet(bulletx, bullety, vel)
-        self._player.weapon.addBullet(bullet)
-        self._objectlist.append(bullet)
-        self._bulletlist.append((bullet,self._shootdir))
+        self.player.weapon.addBullet(bullet)
+        self.settings.objectlist.append(bullet)
+        self.settings.bulletlist.append((bullet,self.player.shootdir))
 
     def _moveBullet(self):
-        for pair in list(self._bulletlist):
+        for pair in list(self.settings.bulletlist):
             bul = pair[0]
             key = pair[1]
             remove = False
@@ -179,12 +171,12 @@ class SinglePLayerGame:
                 else:
                     remove = True
             elif key == 'down':
-                if bul.y < self._SCREENHEIGHT:
+                if bul.y < self.settings.screenheight:
                     bul.y += bul.vel
                 else:
                     remove = True
             elif key == 'right':
-                if bul.x < self._SCREENWIDTH:
+                if bul.x < self.settings.screenwidth:
                     bul.x += bul.vel
                 else:
                     remove = True
@@ -194,22 +186,19 @@ class SinglePLayerGame:
                 else:
                     remove = True
             if remove:
-                self._bulletlist.remove(pair)
-                self._objectlist.remove(bul)
-                self._player.weapon.bul -= 1
-        for bul in self._bulletlist:
-            print(bul)
+                self.settings.bulletlist.remove(pair)
+                self.settings.objectlist.remove(bul)
+                self.player.weapon.bul -= 1
         self._checkHit()
 
     def _checkHit(self):
-        print()
-        for pair in list(self._bulletlist):
+        for pair in list(self.settings.bulletlist):
             bul = pair[0]
             bulx = bul.x
             buly = bul.y
             bulw = bul.width
             bulh = bul.height
-            for enemy in list(self._enemylist):
+            for enemy in list(self.settings.enemylist):
                 ex = enemy.x
                 ey = enemy.y
                 ew = enemy.width
@@ -225,24 +214,25 @@ class SinglePLayerGame:
         else:
             e.health -= 30
             if e.health <= 0:
-                self._enemylist.remove(e)
-                self._objectlist.remove(e)
-                self._score += 50
-        self._bulletlist.remove(tup)
-        self._objectlist.remove(tup[0])
-        self._player.weapon.bul -= 1
+                self.settings.enemylist.remove(e)
+                self.settings.objectlist.remove(e)
+                self.settings.score += 50
+        self.settings.bulletlist.remove(tup)
+        self.settings.objectlist.remove(tup[0])
+        self.player.weapon.bul -= 1
 
     def _collision(self):
-        if self._player.hasshields:
-            self._player.shields -= 30
+        if self.player.hasshields:
+            self.player.shields -= 30
         else:
-            self._player.health -= 50
-            if self._player.health == 0:
+            self.player.health -= 50
+            if self.player.health == 0:
                 self._message_display("Game Over!")
-                self._lvl = 0
-                self._enemylist = []
-                self._objectlist = []
-
+                self.settings.lvl = 0
+                self.settings.enemylist = []
+                self.settings.objectlist = []
+                self.player.weapon.bul = 0
+                self.settings.score = 0
 
     def _checkX(self, enemy, value):
         if enemy.x > value:
@@ -257,5 +247,5 @@ class SinglePLayerGame:
             enemy.y += enemy.vel
 
 if __name__ == "__main__":
-    game = Game()
+    game = SinglePLayerGame()
     game.run()
