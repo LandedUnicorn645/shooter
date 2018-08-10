@@ -2,7 +2,7 @@ import pygame, copy, time, random
 from player import Player
 from enemy import Enemy
 from bullet import Bullet
-from settings import Settings
+
 
 class SinglePLayerGame:
     '''A Game class that runs the game and monitors the state of the game from what level
@@ -10,12 +10,13 @@ class SinglePLayerGame:
 
         '''
     pygame.init()
-    def __init__(self):
-        self.win = pygame.display.set_mode((1000,1000))
-        self.player = Player(500, 500, 20, 20, 10, (0,0,255))
-        self.settings = Settings((1000,1000),self.win)
+    def __init__(self, settings):
+        self.settings = settings
+        self.win = self.settings.win
+        self.player = Player(500, 500, 20, 20, 10, (0,0,255), self.settings)
 
     def run(self):
+        self.win.fill((0,0,0))
         self._message_display("Start")
         while True:
             self.settings.set(self.player)
@@ -38,10 +39,12 @@ class SinglePLayerGame:
                     self.player.lastdir = 'left'
                     x -= vel
                     self.player.x = x
+
                 if keys[pygame.K_d] and x < self.settings.screenwidth - 20:
                     self.player.lastdir = 'right'
                     x += vel
                     self.player.x = x
+
                 if keys[pygame.K_s] and y < self.settings.screenheight - 20:
                     self.player.lastdir = 'down'
                     y += vel
@@ -56,13 +59,17 @@ class SinglePLayerGame:
                     if self.player.weapon.bul < self.player.weapon.ammo:
                         if keys[pygame.K_LEFT]:
                             self.player.shootdir = 'left'
-                        if keys[pygame.K_RIGHT]:
+
+                        elif keys[pygame.K_RIGHT]:
                             self.player.shootdir = 'right'
-                        if keys[pygame.K_DOWN]:
+
+                        elif keys[pygame.K_DOWN]:
                             self.player.shootdir = 'down'
-                        if keys[pygame.K_UP]:
+
+                        elif keys[pygame.K_UP]:
                             self.player.shootdir = 'up'
-                        self._shoot()
+
+                        self.player._shoot()
 
                 self.win.fill((0,0,0))
                 self._draw()
@@ -128,37 +135,6 @@ class SinglePLayerGame:
             else:
                 self._checkX(e, x)
                 self._checkY(e, y)
-
-    def _shoot(self):
-        self.player.weapon.bul += 1
-        x = self.player.x
-        y = self.player.y
-        width = self.player.width
-        height = self.player.height
-        if self.player.shootdir == 'right':
-            bulletx = x + width
-            bullety = y + (height//4)
-
-        elif self.player.shootdir == 'left':
-            bulletx = x - 5
-            bullety = y + (height//2)
-
-        elif self.player.shootdir == "up":
-            bulletx = x + (width//2)
-            bullety = y - 5
-
-        elif self.player.shootdir == 'down':
-            bulletx = x + (width//2)
-            bullety = y + height
-
-        if self.player.shootdir == self.player.lastdir:
-            vel = self.player.vel + 2
-        else:
-            vel = 5
-        bullet = Bullet(bulletx, bullety, vel)
-        self.player.weapon.addBullet(bullet)
-        self.settings.objectlist.append(bullet)
-        self.settings.bulletlist.append((bullet,self.player.shootdir))
 
     def _moveBullet(self):
         for pair in list(self.settings.bulletlist):
