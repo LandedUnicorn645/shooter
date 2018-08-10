@@ -21,19 +21,20 @@ def main():
                 menu.mouse_motion(event)
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 menu.activated_Option()
+        if settings.state != "controls":
 
-        keys = pygame.key.get_pressed()
+            keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_DOWN]:
-            print("DOWN")
-            menu.decreasePointer()
+            if keys[pygame.K_DOWN]:
+                print("DOWN")
+                menu.decreasePointer()
 
-        elif keys[pygame.K_UP]:
-            print("UP")
-            menu.increasePointer()
+            elif keys[pygame.K_UP]:
+                print("UP")
+                menu.increasePointer()
 
-        elif keys[pygame.K_RIGHT]:
-            menu.activated_Option()
+            elif keys[pygame.K_RIGHT]:
+                menu.activated_Option()
 
         win.fill((0,0,0))
         menu.draw()

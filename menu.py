@@ -5,6 +5,7 @@ class Menu:
     def __init__(self, settings):
         self.settings = settings
         self.menuoptions = []
+        self.prevstate = []
         self.win = self.settings.win
         self.pointer = 0
         self.setMenuOptions()
@@ -15,23 +16,31 @@ class Menu:
             item.draw(self.win)
 
     def setMenuOptions(self):
-
+        self.menuoptions = []
         if self.settings.state == "main":
            'add the appropriate menu options in here'
            opt1 = Opt("Start",500, 250, 0 )
-           self.menuoptions.append(opt1)
            opt2 = Opt("Settings",500,500, 1 )
-           self.menuoptions.append(opt2)
            opt3 = Opt("Quit", 500,750, 2 )
-           self.menuoptions.append(opt3)
         elif self.settings.state == "pause":
-           opt1 = Opt("Return", )
-           self.menuoptions.append(opt1)
-           opt2 = Opt("Settings", )
-           self.menuoptions.append(opt2)
-           opt3 = Opt("Quit", )
-           self.menuoptions.append(opt3)
+           opt1 = Opt("Return",500,250,0 )
+           opt2 = Opt("Settings",500,500,1 )
+           opt3 = Opt("Quit", 500,750,2)
+        elif self.settings.state == "settings":
+           opt1 = Opt("Controls", 500,250,0)
+           opt2 = Opt("player", 500, 500, 1)
+           opt3 = Opt("Return", 500,750, 2)
+        elif self.settings.state == "controls":
+           opt1 = Opt("w,s,a,d : move player", 500,250,1, 30)
+           opt2 = Opt("spacebar : shoot", 500, 350, 2, 30)
+           opt3 = Opt("arrow keys : change shooting direction", 500,450, 3, 30)
+           opt4 = Opt("Return", 500, 850,0  )
+           self.pointer = 0
+           self.menuoptions.append(opt4)
 
+        self.menuoptions.append(opt1)
+        self.menuoptions.append(opt2)
+        self.menuoptions.append(opt3)
         self.menuoptions[self.pointer].select = True
 
     def increasePointer(self):
@@ -59,24 +68,38 @@ class Menu:
                 self.pointer = item.pos
 
     def activated_Option(self):
+        print(self.pointer)
         text = self.menuoptions[self.pointer].text
+        print(self.menuoptions[self.pointer].text)
         if text == "Start":
             game = SinglePLayerGame(self.settings)
             game.run()
+        elif text == "Controls":
+            self.prevstate.append(self.settings.state)
+            self.settings.state = "controls"
+            self.setMenuOptions()
+
         elif text == "Settings":
-            'display settings'
+            self.prevstate.append(self.settings.state)
+            self.settings.state = "settings"
+            self.setMenuOptions()
+        elif text == "Return":
+            print("Enter")
+            self.settings.state = self.prevstate[len(self.prevstate)-1]
+            self.prevstate.pop()
+            self.setMenuOptions()
         elif text == "Quit":
             pygame.quit()
             quit()
 
 class Opt:
-    def __init__(self, text, x, y, pos):
+    def __init__(self, text, x, y, pos, size = 100):
         self.select = False
         self.text = text
         self.x = x
         self.y = y
         self.font = "freesansbold.ttf"
-        self.size = 100
+        self.size = size
         self.color = (255,255,255)
         self.rect = None
         self.pos = pos

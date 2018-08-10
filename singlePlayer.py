@@ -10,10 +10,10 @@ class SinglePLayerGame:
 
         '''
     pygame.init()
-    def __init__(self, settings):
+    def __init__(self, settings, color=(0,0,255)):
         self.settings = settings
         self.win = self.settings.win
-        self.player = Player(500, 500, 20, 20, 10, (0,0,255), self.settings)
+        self.player = Player(500, 500, 20, 20, 10, color, self.settings)
 
     def run(self):
         self.win.fill((0,0,0))
@@ -22,7 +22,7 @@ class SinglePLayerGame:
             self.settings.set(self.player)
             text = "lvl " + str(self.settings.lvl)
             self._message_display(text)
-            self._createEnemies()
+            self._createEnemies(self.player.color)
             while len(self.settings.enemylist) > 0:
                 x = self.player.x
                 y = self.player.y
@@ -100,11 +100,15 @@ class SinglePLayerGame:
         for object in self.settings.objectlist:
             pygame.draw.rect(self.win, object.color, (object.x, object.y, object.width, object.height))
 
-    def _createEnemies(self):
+    def _createEnemies(self, color):
             if self.settings.lvl > 3 and self.settings.lvl < 10:
                 for e in range(self.settings.enemynum + 1):
+                    if color == (0,0,255):
+                        ecolor = (255,0,0)
+                    elif color == (255,0,0):
+                        ecolor = (0,0,255)
                     type = random.randint(1,2)
-                    enemy = Enemy(10,10,self.settings.screenwidth,self.settigs.screenheight, 3, type)
+                    enemy = Enemy(10,10,self.settings.screenwidth,self.settigs.screenheight, 3, type, ecolor)
                     self.settings.enemylist.append(enemy)
                     self.settings.objectlist.append(enemy)
             elif self.settings.lvl > 10:

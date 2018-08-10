@@ -1,4 +1,4 @@
-
+import pygame
 class Settings:
     def __init__(self, tup, window):
         self.screenheight = tup[1]
