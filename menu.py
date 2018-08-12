@@ -8,10 +8,12 @@ class Menu:
         self.prevstate = []
         self.win = self.settings.win
         self.pointer = 0
+        self.background_image = pygame.image.load("manu_image2.jpg")#.convert()
         self.setMenuOptions()
 
 
     def draw(self):
+        self.win.blit(self.background_image, (0,0))
         for item in self.menuoptions:
             item.draw(self.win)
 
@@ -19,22 +21,26 @@ class Menu:
         self.menuoptions = []
         if self.settings.state == "main":
            'add the appropriate menu options in here'
-           opt1 = Opt("Start",500, 250, 0 )
-           opt2 = Opt("Settings",500,500, 1 )
-           opt3 = Opt("Quit", 500,750, 2 )
+           opt1 = Opt("Start",self.settings.screenwidth/2,self.settings.screenheight/4 , 0 )
+           opt2 = Opt("Settings",self.settings.screenwidth/2,self.settings.screenheight/2, 1 )
+           opt3 = Opt("Quit", self.settings.screenwidth/2,(self.settings.screenheight/4)*3, 2 )
+        elif self.settings.state == "game":
+           opt1 = Opt("SinglePlayer",self.settings.screenwidth/2,self.settings.screenheight/4,0 )
+           opt2 = Opt("Multiplayer",self.settings.screenwidth/2,self.settings.screenheight/2,1 )
+           opt3 = Opt("Return", self.settings.screenwidth/2,(self.settings.screenheight/4)*3,2)
         elif self.settings.state == "pause":
-           opt1 = Opt("Return",500,250,0 )
-           opt2 = Opt("Settings",500,500,1 )
-           opt3 = Opt("Quit", 500,750,2)
+           opt1 = Opt("Return",self.settings.screenwidth/2,self.settings.screenheight/4,0 )
+           opt2 = Opt("Settings",self.settings.screenwidth/2,self.settings.screenheight/2,1 )
+           opt3 = Opt("Quit", self.settings.screenwidth/2,(self.settings.screenheight/4)*3,2)
         elif self.settings.state == "settings":
-           opt1 = Opt("Controls", 500,250,0)
-           opt2 = Opt("player", 500, 500, 1)
-           opt3 = Opt("Return", 500,750, 2)
+           opt1 = Opt("Controls", self.settings.screenwidth/2,self.settings.screenheight/4,0)
+           opt2 = Opt("player", self.settings.screenwidth/2,self.settings.screenheight/2, 1)
+           opt3 = Opt("Return", self.settings.screenwidth/2,(self.settings.screenheight/4)*3, 2)
         elif self.settings.state == "controls":
-           opt1 = Opt("w,s,a,d : move player", 500,250,1, 30)
-           opt2 = Opt("spacebar : shoot", 500, 350, 2, 30)
-           opt3 = Opt("arrow keys : change shooting direction", 500,450, 3, 30)
-           opt4 = Opt("Return", 500, 850,0  )
+           opt1 = Opt("w,s,a,d : move player", self.settings.screenwidth/2,self.settings.screenheight/4,1, 30)
+           opt2 = Opt("spacebar : shoot", self.settings.screenwidth/2, (self.settings.screenheight/20)*7, 2, 30)
+           opt3 = Opt("arrow keys : change shooting direction", self.settings.screenwidth/2,(self.settings.screenheight/20)*9, 3, 30)
+           opt4 = Opt("Return", self.settings.screenwidth/2, (self.settings.screenheight/20)*17,0  )
            self.pointer = 0
            self.menuoptions.append(opt4)
 
@@ -68,30 +74,27 @@ class Menu:
                 self.pointer = item.pos
 
     def activated_Option(self):
-        print(self.pointer)
         text = self.menuoptions[self.pointer].text
-        print(self.menuoptions[self.pointer].text)
-        if text == "Start":
-            game = SinglePLayerGame(self.settings)
-            game.run()
-        elif text == "Controls":
-            self.prevstate.append(self.settings.state)
-            self.settings.state = "controls"
-            self.setMenuOptions()
-
-        elif text == "Settings":
-            self.prevstate.append(self.settings.state)
-            self.settings.state = "settings"
-            self.setMenuOptions()
-        elif text == "Return":
-            print("Enter")
-            self.settings.state = self.prevstate[len(self.prevstate)-1]
-            self.prevstate.pop()
-            self.setMenuOptions()
-        elif text == "Quit":
+        if text == "Quit":
             pygame.quit()
             quit()
-
+        else:
+            if text == "Start":
+                self.prevstate.append(self.settings.state)
+                self.settings.state = "game"
+            elif text == "S1inglePlayer":
+                game = SinglePLayerGame(self.settings)
+                game.run()
+            elif text == "Controls":
+                self.prevstate.append(self.settings.state)
+                self.settings.state = "controls"
+            elif text == "Settings":
+                self.prevstate.append(self.settings.state)
+                self.settings.state = "settings"
+            elif text == "Return":
+                self.settings.state = self.prevstate[len(self.prevstate)-1]
+                self.prevstate.pop()
+            self.setMenuOptions()
 class Opt:
     def __init__(self, text, x, y, pos, size = 100):
         self.select = False
@@ -124,8 +127,9 @@ class Opt:
     def mouse_hover(self, event):
         mouseX = event.pos[0]
         mouseY = event.pos[1]
-        if mouseX > self.rect.x and mouseX < self.rect.x + self.rect.width:
-            if mouseY > self.rect.y and mouseY < self.rect.y + self.rect.height:
-                self.select = True
-                return
+        if self.rect:
+            if mouseX > self.rect.x and mouseX < self.rect.x + self.rect.width:
+                if mouseY > self.rect.y and mouseY < self.rect.y + self.rect.height:
+                    self.select = True
+                    return
         self.select = False
