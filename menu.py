@@ -24,10 +24,11 @@ class Menu:
            opt1 = Opt("Start",self.settings.screenwidth/2,self.settings.screenheight/4 , 0 )
            opt2 = Opt("Settings",self.settings.screenwidth/2,self.settings.screenheight/2, 1 )
            opt3 = Opt("Quit", self.settings.screenwidth/2,(self.settings.screenheight/4)*3, 2 )
-        elif self.settings.state == "game":
+        '''elif self.settings.state == "game":
            opt1 = Opt("SinglePlayer",self.settings.screenwidth/2,self.settings.screenheight/4,0 )
            opt2 = Opt("Multiplayer",self.settings.screenwidth/2,self.settings.screenheight/2,1 )
            opt3 = Opt("Return", self.settings.screenwidth/2,(self.settings.screenheight/4)*3,2)
+           '''
         elif self.settings.state == "pause":
            opt1 = Opt("Return",self.settings.screenwidth/2,self.settings.screenheight/4,0 )
            opt2 = Opt("Settings",self.settings.screenwidth/2,self.settings.screenheight/2,1 )
@@ -80,8 +81,10 @@ class Menu:
             quit()
         else:
             if text == "Start":
-                self.prevstate.append(self.settings.state)
-                self.settings.state = "game"
+                game = SinglePLayerGame(self.settings)
+                game.run()
+                '''self.prevstate.append(self.settings.state)
+                self.settings.state = "game"'''
             elif text == "S1inglePlayer":
                 game = SinglePLayerGame(self.settings)
                 game.run()
@@ -108,19 +111,13 @@ class Opt:
         self.pos = pos
 
     def draw(self, screen):
-
-        # Creates a new Font Object with that font style and size
         textype = pygame.font.Font(self.font, self.size)
-        # Draws self._text to a new Surface
         if self.select:
             self.color = (0,0,255)
         else:
             self.color = (255,255,255)
         text = textype.render(self.text, 0, self.color)
-        # Gets the rectangle for the text
         self.rect = text.get_rect()
-        # Gives the rectangle it s center (not the top left corner)
-
         self.rect.center = (self.x, self.y)
         screen.blit(text, self.rect)
 
