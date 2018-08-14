@@ -8,6 +8,15 @@ class SinglePLayerGame:
     '''A Game class that runs the game and monitors the state of the game from what level
         to the number of enemies
 
+        Parameters :
+            settings - a settings object that contains information about the window and state, etc
+            color - the color for the
+
+        Attributes :
+            settings - points to the setting object
+            win - the window that everything will be drawn on
+            player - the users player 
+
         '''
     pygame.init()
     def __init__(self, settings, color=(0,0,255)):

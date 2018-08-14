@@ -2,6 +2,22 @@ import pygame
 from singlePlayer import SinglePLayerGame
 
 class Menu:
+    """ A menu object that changes the options depending obn the state of the game
+
+        Parameters :
+            settings - settings objects that holds the state of the game and window
+
+        Attributes :
+
+            settings - points to the settings object
+            menuoptions - list of options in the menu available to the user
+            prevstate - the previous state the game was.
+                        used for 'Return button in menu'(used as a stack )
+            win - window everything gets drawn on
+            pointer - the menu option the user is at/pointing to
+            background_image - the background image for the menu 
+
+    """
     def __init__(self, settings):
         self.settings = settings
         self.menuoptions = []
