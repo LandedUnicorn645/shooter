@@ -1,5 +1,6 @@
 from person import Person
 from machinegun import MachineGun
+from bullet import Bullet
 
 class Player(Person):
     def __init__(self, x, y, width, height,  vel, color, settings):
@@ -10,7 +11,7 @@ class Player(Person):
         self.currweapon = self.mgun
         self.shootdir = 'left'
         self.lastdir = 'left'
-        self.settings = settings 
+        self.settings = settings
 
     def __getWeapon(self):
         return self.currweapon
@@ -44,7 +45,7 @@ class Player(Person):
         bullet = Bullet(bulletx, bullety, vel)
         self.weapon.addBullet(bullet)
         self.settings.objectlist.append(bullet)
-        self.settings.bulletlist.append((bullet,self.player.shootdir))
+        self.settings.bulletlist.append((bullet,self.shootdir))
 
 
     weapon = property(__getWeapon)

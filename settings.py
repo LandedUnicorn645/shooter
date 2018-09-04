@@ -25,12 +25,14 @@ class Settings:
         self.win = window
         self.score = 0
         self.lvl = 0
+        self.player = None
         self.objectlist = []
         self.bulletlist = []
         self.enemylist = []
         self.enemynum = 4
 
     def set(self, player):
+        self.player = player
         self.objectlist = []
         self.bulletlist = []
         self.enemylist = []

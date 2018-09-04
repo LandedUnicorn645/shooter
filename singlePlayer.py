@@ -2,7 +2,7 @@ import pygame, copy, time, random
 from player import Player
 from enemy import Enemy
 from bullet import Bullet
-
+import game_methods as gm
 
 class SinglePLayerGame:
     '''A Game class that runs the game and monitors the state of the game from what level
@@ -15,7 +15,7 @@ class SinglePLayerGame:
         Attributes :
             settings - points to the setting object
             win - the window that everything will be drawn on
-            player - the users player 
+            player - the users player
 
         '''
     pygame.init()
@@ -26,16 +26,13 @@ class SinglePLayerGame:
 
     def run(self):
         self.win.fill((0,0,0))
-        self._message_display("Start")
+        gm._message_display(self.settings, "Start")
         while True:
             self.settings.set(self.player)
             text = "lvl " + str(self.settings.lvl)
-            self._message_display(text)
-            self._createEnemies(self.player.color)
+            gm._message_display(self.settings,text)
+            gm._createEnemies(self.settings,self.player.color)
             while len(self.settings.enemylist) > 0:
-                x = self.player.x
-                y = self.player.y
-                vel = self.player.vel
                 pygame.time.delay(100)
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -43,6 +40,10 @@ class SinglePLayerGame:
                         quit()
 
                 keys = pygame.key.get_pressed()
+
+                x = self.player.x
+                y = self.player.y
+                vel = self.player.vel
 
                 if keys[pygame.K_a] and x > 0:
                     self.player.lastdir = 'left'
@@ -84,20 +85,10 @@ class SinglePLayerGame:
                 self._draw()
                 self._scoreCal()
                 pygame.display.update()
-                self._moveEnemy()
-                self._moveBullet()
+                gm._moveEnemy(self.settings)
+                gm._moveBullet(self.settings)
 
-    def _message_display(self,text):
-        textype = pygame.font.Font('freesansbold.ttf', 115)
-        TextSurf, TextRect = self._text_objects(text, textype)
-        TextRect.center = ((self.settings.screenwidth/2),(self.settings.screenheight/2))
-        self.win.blit(TextSurf, TextRect)
-        pygame.display.update()
-        time.sleep(2)
 
-    def _text_objects(self,text, font):
-        textSurface = font.render(text,True,(255,255,255))
-        return textSurface, textSurface.get_rect()
 
     def _scoreCal(self):
         font = pygame.font.SysFont(None, 25)
@@ -109,7 +100,20 @@ class SinglePLayerGame:
         for object in self.settings.objectlist:
             pygame.draw.rect(self.win, object.color, (object.x, object.y, object.width, object.height))
 
-    def _createEnemies(self, color):
+''' def _message_display(self,text):
+    textype = pygame.font.Font('freesansbold.ttf', 115)
+    TextSurf, TextRect = self._text_objects(text, textype)
+    TextRect.center = ((self.settings.screenwidth/2),(self.settings.screenheight/2))
+    self.win.blit(TextSurf, TextRect)
+    pygame.display.update()
+    time.sleep(2)
+
+def _text_objects(self,text, font):
+    textSurface = font.render(text,True,(255,255,255))
+    return textSurface, textSurface.get_rect()
+
+
+def _createEnemies(self, color):
             if self.settings.lvl > 3 and self.settings.lvl < 10:
                 for e in range(self.settings.enemynum + 1):
                     if color == (0,0,255):
@@ -133,7 +137,7 @@ class SinglePLayerGame:
                     self.settings.enemylist.append(enemy)
                     self.settings.objectlist.append(enemy)
 
-    def _moveEnemy(self):
+   def _moveEnemy(self):
         x = self.player.x
         y = self.player.y
         w = self.player.width
@@ -233,7 +237,7 @@ class SinglePLayerGame:
         if enemy.y > value:
             enemy.y -= enemy.vel
         elif enemy.y < value:
-            enemy.y += enemy.vel
+            enemy.y += enemy.vel'''
 
 if __name__ == "__main__":
     game = SinglePLayerGame()

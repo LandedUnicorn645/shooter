@@ -15,7 +15,7 @@ class Menu:
                         used for 'Return button in menu'(used as a stack )
             win - window everything gets drawn on
             pointer - the menu option the user is at/pointing to
-            background_image - the background image for the menu 
+            background_image - the background image for the menu
 
     """
     def __init__(self, settings):
@@ -24,7 +24,7 @@ class Menu:
         self.prevstate = []
         self.win = self.settings.win
         self.pointer = 0
-        self.background_image = pygame.image.load("manu_image2.jpg")#.convert()
+        self.background_image = pygame.image.load("game_image.jpg")#.convert()
         self.setMenuOptions()
 
 
@@ -40,11 +40,7 @@ class Menu:
            opt1 = Opt("Start",self.settings.screenwidth/2,self.settings.screenheight/4 , 0 )
            opt2 = Opt("Settings",self.settings.screenwidth/2,self.settings.screenheight/2, 1 )
            opt3 = Opt("Quit", self.settings.screenwidth/2,(self.settings.screenheight/4)*3, 2 )
-        '''elif self.settings.state == "game":
-           opt1 = Opt("SinglePlayer",self.settings.screenwidth/2,self.settings.screenheight/4,0 )
-           opt2 = Opt("Multiplayer",self.settings.screenwidth/2,self.settings.screenheight/2,1 )
-           opt3 = Opt("Return", self.settings.screenwidth/2,(self.settings.screenheight/4)*3,2)
-           '''
+
         elif self.settings.state == "pause":
            opt1 = Opt("Return",self.settings.screenwidth/2,self.settings.screenheight/4,0 )
            opt2 = Opt("Settings",self.settings.screenwidth/2,self.settings.screenheight/2,1 )
