@@ -1,4 +1,4 @@
-
+''' This file contains the weapon objects in the game'''
 class Gun:
     def __init__(self, maxammo, lockon=False):
         self._maxammo = maxammo
@@ -40,3 +40,10 @@ class Gun:
     ammo = property( __getAmmo, __setAmmo)
     lock = property( __getLock, __setLock)
     bullet = property( __getbullets)
+
+
+class MachineGun(Gun):
+    def __init__(self, maxammo):
+        Gun.__init__(self, maxammo)
+
+  

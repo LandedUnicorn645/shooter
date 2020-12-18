@@ -1,5 +1,5 @@
 import pygame
-from singlePlayer import SinglePLayerGame
+from singleplayer.singlePlayer import SinglePlayer
 
 class Menu:
     """ A menu object that changes the options depending obn the state of the game
@@ -24,7 +24,7 @@ class Menu:
         self.prevstate = []
         self.win = self.settings.win
         self.pointer = 0
-        self.background_image = pygame.image.load("game_image.jpg")#.convert()
+        self.background_image = pygame.image.load("images/game_image.jpg")#.convert()
         self.setMenuOptions()
 
 
@@ -35,25 +35,27 @@ class Menu:
 
     def setMenuOptions(self):
         self.menuoptions = []
+        width = self.settings.screenwidth
+        height = self.settings.screenheight
         if self.settings.state == "main":
            'add the appropriate menu options in here'
-           opt1 = Opt("Start",self.settings.screenwidth/2,self.settings.screenheight/4 , 0 )
-           opt2 = Opt("Settings",self.settings.screenwidth/2,self.settings.screenheight/2, 1 )
-           opt3 = Opt("Quit", self.settings.screenwidth/2,(self.settings.screenheight/4)*3, 2 )
+           opt1 = Opt("Start", width/2, height/4 , 0 )
+           opt2 = Opt("Settings", width/2, height/2, 1 )
+           opt3 = Opt("Quit", width/2,( height/4 )*3, 2 )
 
         elif self.settings.state == "pause":
-           opt1 = Opt("Return",self.settings.screenwidth/2,self.settings.screenheight/4,0 )
-           opt2 = Opt("Settings",self.settings.screenwidth/2,self.settings.screenheight/2,1 )
-           opt3 = Opt("Quit", self.settings.screenwidth/2,(self.settings.screenheight/4)*3,2)
+           opt1 = Opt("Return", width/2, height/4, 0 )
+           opt2 = Opt("Settings", width/2, height/2, 1 )
+           opt3 = Opt("Quit", width/2,( height/4 )*3, 2)
         elif self.settings.state == "settings":
-           opt1 = Opt("Controls", self.settings.screenwidth/2,self.settings.screenheight/4,0)
-           opt2 = Opt("player", self.settings.screenwidth/2,self.settings.screenheight/2, 1)
-           opt3 = Opt("Return", self.settings.screenwidth/2,(self.settings.screenheight/4)*3, 2)
+           opt1 = Opt("Controls", width/2, height/4,0)
+           opt2 = Opt("player", width/2, height/2, 1)
+           opt3 = Opt("Return", width/2,( height/4 )*3, 2)
         elif self.settings.state == "controls":
-           opt1 = Opt("w,s,a,d : move player", self.settings.screenwidth/2,self.settings.screenheight/4,1, 30)
-           opt2 = Opt("spacebar : shoot", self.settings.screenwidth/2, (self.settings.screenheight/20)*7, 2, 30)
-           opt3 = Opt("arrow keys : change shooting direction", self.settings.screenwidth/2,(self.settings.screenheight/20)*9, 3, 30)
-           opt4 = Opt("Return", self.settings.screenwidth/2, (self.settings.screenheight/20)*17,0  )
+           opt1 = Opt("w,s,a,d : move player", width/2, height/4, 1, 30)
+           opt2 = Opt("spacebar : shoot", width/2, ( height/20 )*7, 2, 30)
+           opt3 = Opt("arrow keys : change shooting direction", width/2,( height/20 )*9, 3, 30)
+           opt4 = Opt("Return", width/2, ( height/20 )*17, 0)
            self.pointer = 0
            self.menuoptions.append(opt4)
 
@@ -93,12 +95,12 @@ class Menu:
             quit()
         else:
             if text == "Start":
-                game = SinglePLayerGame(self.settings)
+                game = SinglePlayer(self.settings)
                 game.run()
                 '''self.prevstate.append(self.settings.state)
                 self.settings.state = "game"'''
             elif text == "S1inglePlayer":
-                game = SinglePLayerGame(self.settings)
+                game = SinglePlayer(self.settings)
                 game.run()
             elif text == "Controls":
                 self.prevstate.append(self.settings.state)

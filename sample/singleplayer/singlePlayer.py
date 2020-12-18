@@ -1,10 +1,10 @@
 import pygame, copy, time, random
-from player import Player
-from enemy import Enemy
-from bullet import Bullet
+from gameObjects.player import Player
+from gameObjects.enemy import Enemy
+from gameObjects.bullet import Bullet
 import game_methods as gm
 
-class SinglePLayerGame:
+class SinglePlayer:
     '''A Game class that runs the game and monitors the state of the game from what level
         to the number of enemies
 
@@ -18,8 +18,8 @@ class SinglePLayerGame:
             player - the users player
 
         '''
-    pygame.init()
     def __init__(self, settings, color=(0,0,255)):
+        pygame.init()
         self.settings = settings
         self.win = self.settings.win
         self.player = Player(500, 500, 20, 20, 10, color, self.settings)

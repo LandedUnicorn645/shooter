@@ -1,6 +1,6 @@
-from person import Person
-from machinegun import MachineGun
-from bullet import Bullet
+from gameObjects.person import Person
+from gameObjects.weapons import MachineGun
+from gameObjects.bullet import Bullet
 
 class Player(Person):
     def __init__(self, x, y, width, height,  vel, color, settings):

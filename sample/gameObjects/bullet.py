@@ -1,4 +1,4 @@
-from object import Object
+from gameObjects.object import Object
 
 class Bullet(Object):
     def __init__(self, x, y, vel ):

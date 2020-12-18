@@ -1,4 +1,3 @@
-import pygame
 class Settings:
     '''Settings object that will keep information baout hte current game
 

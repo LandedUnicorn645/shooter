@@ -1,6 +1,6 @@
 import pygame
 from settings import Settings
-from singlePlayer import SinglePLayerGame
+from singleplayer.singlePlayer import SinglePlayer
 from menu import Menu
 
 def main():
