@@ -18,8 +18,8 @@ class Settings:
 
     '''
     def __init__(self, tup, window):
-        self.screenheight = tup[1]
-        self.screenwidth = tup[0]
+        self.screenheight = tup[0]
+        self.screenwidth = tup[1]
         self.state = "main"
         self.win = window
         self.score = 0
