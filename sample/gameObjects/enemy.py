@@ -1,5 +1,5 @@
 import random
-from person import Person
+from gameObjects.person import Person
 
 class Enemy(Person):
     def __init__(self, width, height, screenwidth, screenheight, vel, type, color=(255,0,0)):

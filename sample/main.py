@@ -1,14 +1,16 @@
 import pygame
 from settings import Settings
-from singlePlayer import SinglePLayerGame
+from singleplayer.singlePlayer import SinglePlayer
 from menu import Menu
 
 def main():
     pygame.init()
     print("creating window")
-    win = pygame.display.set_mode((1000,1000))
+    height = 500
+    width = 500
+    win = pygame.display.set_mode((height,width))
     print("creating settings")
-    settings = Settings((1000,1000), win)
+    settings = Settings((height,width), win)
     menu = Menu(settings)
     menu.draw()
     while True:

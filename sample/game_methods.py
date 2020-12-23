@@ -1,5 +1,5 @@
 import pygame, time
-from enemy import Enemy
+from gameObjects.enemy import Enemy
 
 def _createEnemies(settings, color):
         print("settings.enemynum : ",settings.enemynum)
@@ -121,7 +121,7 @@ def _collision(settings, e):
         settings.player.shields -= 30
     else:
         settings.player.health -= 50
-        if settings.player.health == 0:)
+        if settings.player.health == 0:
             _message_display(settings, "Game Over!")
             settings.lvl = 0
             settings.enemylist = []
